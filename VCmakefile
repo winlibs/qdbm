@@ -7,9 +7,6 @@
 #================================================================
 
 
-# VC++ directory
-VCPATH = C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7
-
 # User options
 YOUR_CLFLAGS =
 YOUR_LIBFLAGS =
@@ -46,30 +43,27 @@ LIB_APPEND = _t
 EXE_APPEND = _t
 !ELSEIF "$(CFG)" == "dd"
 !MESSAGE Build using dynamic threaded debug configuration
-BASE_FLAGS = /MDd /W3 /ZI /Od /FD /GZ /Fo"$(OUTDIR)\\" /Fd"$(OUTDIR)\\"
+BASE_FLAGS = /MDd /W3 /ZI /Od /FD /GZ /Fo"$(OUTDIR)\\" /Fd"$(OUTDIR)\\qdbm_debug.pdb"
 BASE_DEFS = /D_DEBUG /D__DEBUG__
-OUTDIR = .\tmp_dd
-LIB_APPEND = _dd
-EXE_APPEND = _dd
+OUTDIR = .\tmp_debug
+LIB_APPEND = _debug
+EXE_APPEND = _debug
 !ELSE
 !MESSAGE Build using dynamic threaded release configuration
 BASE_DEFS = /DNDEBUG
-BASE_FLAGS = /MD /W3 /O2 /FD /Fo"$(OUTDIR)\\" /Fd"$(OUTDIR)\\"
+BASE_FLAGS = /guard:cf /Zc:inline /Gw /MP /GF /MD /W3 /Ox /FD /Zi /Fo"$(OUTDIR)\\" /Fd"$(OUTDIR)\\qdbm.pdb"
 OUTDIR = .\tmp
 LIB_APPEND =
 EXE_APPEND =
 !ENDIF
 
 # Building binaries
-CLFLAGS = /I "$(VCPATH)\Include" /I "$(VCPATH)\PlatformSDK\Include" /I "." \
-  /nologo $(YOUR_CLFLAGS) $(BASE_FLAGS) $(BASE_DEFS) /D_CRT_SECURE_NO_DEPRECATE=1
-LIBFLAGS = /libpath:"$(VCPATH)\lib" /libpath:"$(VCPATH)\PlatformSDK\Lib" /libpath:"." \
-  /nologo $(YOUR_LIBFLAGS)
-LINKFLAGS = /libpath:"$(VCPATH)\lib" /libpath:"$(VCPATH)\PlatformSDK\Lib" /libpath:"." \
-  /nologo $(YOUR_LINKFLAGS)
+CLFLAGS = /I "." /nologo $(YOUR_CLFLAGS) $(BASE_FLAGS) $(BASE_DEFS) /D_CRT_SECURE_NO_DEPRECATE=1
+LIBFLAGS = /libpath:"." /nologo $(YOUR_LIBFLAGS)
+LINKFLAGS = /libpath:"." /nologo $(YOUR_LINKFLAGS)
 
 # Targets
-MYLIBS = qdbm$(LIB_APPEND).dll qdbm$(LIB_APPEND).lib qdbm$(LIB_APPEND)_static.lib
+MYLIBS = qdbm$(LIB_APPEND).dll qdbm$(LIB_APPEND).lib qdbm_a$(LIB_APPEND).lib
 LIBOBJS = $(OUTDIR)\depot.obj $(OUTDIR)\curia.obj $(OUTDIR)\relic.obj \
   $(OUTDIR)\hovel.obj $(OUTDIR)\cabin.obj $(OUTDIR)\villa.obj \
   $(OUTDIR)\vista.obj $(OUTDIR)\odeum.obj $(OUTDIR)\myconf.obj
@@ -142,7 +136,7 @@ qdbm$(LIB_APPEND).dll : $(LIBOBJS) qdbm.def
 qdbm$(LIB_APPEND).lib : qdbm$(LIB_APPEND).dll
 
 
-qdbm$(LIB_APPEND)_static.lib : $(LIBOBJS)
+qdbm_a$(LIB_APPEND).lib : $(LIBOBJS)
 	lib $(LIBFLAGS) /OUT:$@ $(LIBOBJS)
 
 
